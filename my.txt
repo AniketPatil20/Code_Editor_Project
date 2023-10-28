@@ -1,0 +1,12 @@
+ else if (lang == "Java") {
+      if (!input) {
+        // If there's no input, compile the Java code without input
+        var envData = { OS: "windows" };
+        compiler.compileJava(envData, code, function (data) {
+          if (data.output) {
+            res.send(data);
+          } else {
+            res.send({ output: "error" });
+          }
+        });
+      } 

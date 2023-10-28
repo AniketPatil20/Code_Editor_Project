@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Bootstrap Linking -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+<!-- Codemirror Linking -->
+<link rel="stylesheet" href="codemirror-5.65.15/lib/codemirror.css">
+<!-- Codemirror JavaScript  -->
+<script src="codemirror-5.65.15/lib/codemirror.js"></script>
+<!-- Python -->
+<script src="codemirror-5.65.15/mode/python/python.js"></script>
+<!-- Linking clike js file -->
+<script src="codemirror-5.65.15/mode/clike/clike.js"></script>
+<!-- CSS Theme -->
+<link rel="stylesheet" href="codemirror-5.65.15/theme/dracula.css">
+<!-- Addon Closebracket Supprots in coding when user click on open bracket -->
+<script src="codemirror-5.65.15/addon/edit/closebrackets.js"></script>
+<!-- Icon -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+
+</head>
+<body>
+    <div class="row m-3">
+  <div class="col">
+    <div class="d-flex justify-content-between mb-2 bg-dark rounded p-2">
+        <div class="col-sm-3">
+            <label class="visually-hidden" for="specificSizeSelect">Preference</label>
+            <select class="form-select" id="specificSizeSelect">
+              <option selected>Choose...</option>
+              <option value="Java">Java</option>
+              <option value="Cpp">Cpp</option>
+              <option value="Python">Python</option>
+            </select>
+          </div>
+    
+    <div>
+        <button type="button" class="btn btn-success">Coding Sprint</button>
+        <button type="button" id="run" class="btn btn-success"><i class="bi bi-play-fill"></i></button>
+    </div>
+</div>
+    <textarea type="text" id="editor" class="form-control"  aria-label="First name"></textarea>
+  </div>
+  <div class="col d-flex flex-column rounded bg-dark px-4">
+    <div class="h-50">
+        <label for="Input" class="text-light mt-4 mb-2">Input</label>
+        <textarea type="text" id="input"class="form-control h-75" aria-label="Last name"></textarea>
+    </div>
+    <div class="h-50">
+        <label for="Output" class="text-light mb-2">Output</label>
+        <textarea type="text" id="output"class="form-control h-75" aria-label="Last name"></textarea>
+    </div>
+  </div>
+</div>
+</body>
+<script>
+    //Here we are passing the textArea having id name editor 
+    var editor=CodeMirror.fromTextArea(document.getElementById("editor"),
+    {
+        //Paasing parameters as a object 
+        //Here we are assigning the mode it means for which language we are giving the support
+        mode:"text/x-c++src", 
+        theme: "dracula",
+        lineNumbers:true,
+        autoCloseBrackets:true
+       // "text/x-java"
+    })
+    var width=window.innerWidth
+    var input=document.getElementById("input")
+    var output=document.getElementById("output")
+    var run=document.getElementById("run")
+    editor.setSize(0.7*width,"500")//70% of the screen
+    var option=document.getElementById("specificSizeSelect")
+    option.addEventListener("change",function()
+    {
+        if(option.value=="Java"){
+            editor.setOption("mode","text/x-java")
+        }
+        else if(option.value=="Python"){
+            editor.setOption("mode","text/x-python")
+        }
+        else{
+            editor.setOption("mode","text/x-c++src")
+        }
+    })
+    var code;
+    run.addEventListener("click",async function(){
+        code={
+            code:editor.getValue(),//getting code from text editor
+            input:input.value,
+            lang:option.value
+        }
+        var oData=await fetch("http://localhost:8000/compile",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(code)
+        })
+        var d = await oData.json()
+        output.value=d.output
+    })
+</script>
+</html>
